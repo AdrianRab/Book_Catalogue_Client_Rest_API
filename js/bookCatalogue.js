@@ -14,11 +14,7 @@ $(document).ready(function(){
               var title = $('<div>').text(json[i].title);
               title.addClass('list-group-item-action');
               var titleDiv= $('<div>');
-              titleDiv.addClass('hidden');
-              newBook.append(title, titleDiv);
-              allBooks.append(newBook);
 
-              console.log(json);
               var author = $('<p>').text(json[i].author);
               author.addClass('list-group-item-action');
               var publisher = $('<p>').text(json[i].publisher);
@@ -27,12 +23,24 @@ $(document).ready(function(){
               type.addClass('list-group-item-action');
               var isbn = $('<p>').text(json[i].isbn);
               isbn.addClass('list-group-item-action');
+              titleDiv.addClass('hidden');
+              titleDiv.attr("hidden");
               titleDiv.append(author, publisher, type, isbn);
+              newBook.append(title);
+              title.append(titleDiv);
+              allBooks.append(newBook);
+
+              console.log(json);
               console.log(json[i].author);
               console.log(json[i].title);
             }
-            newBook.on('click', function(){
+            title.on('click', function(){
               titleDiv.toggle('hidden');
+              if (titleDiv.attr('hidden')) {
+                  titleDiv.removeAttr('hidden');
+              }else {
+                titleDiv.attr('hidden');
+              }
             });
           })
   				.fail(function(xhr,	status,
