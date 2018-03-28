@@ -35,7 +35,7 @@ $(document).ready(function(){
                           type.addClass('list-group-item-action');
                           var isbn = $('<p>').text(json1.isbn);
                           isbn.addClass('list-group-item-action');
-                          titleDiv.toggle('hidden');
+                          titleDiv.toggleClass('hidden');
                           titleDiv.append(author, publisher, type, isbn);
                           console.log($(this).author);
                       })

@@ -1,7 +1,10 @@
 $(document).ready(function(){
   var allBooks = $('#allBooks');
 
-  $.ajax({
+  allBooksList();
+
+  function allBooksList() {
+    $.ajax({
   				url:	'http://localhost:8282/books',
           data: {},
           type:"GET",
@@ -11,37 +14,46 @@ $(document).ready(function(){
             var	newBook	=	$('<li>');
             newBook.addClass('list-group-item'); //stylowanie boostrapem
             for (var i = 0; i < json.length; i++) {
-              var title = $('<div>').text(json[i].title);
-              title.addClass('list-group-item-action');
-              var titleDiv= $('<div>');
+              var title = $('<div>').text(json[i].id + '. '+ json[i].title);
+              title.addClass('list-group-item-action book-title');
 
-              var author = $('<p>').text(json[i].author);
-              author.addClass('list-group-item-action');
-              var publisher = $('<p>').text(json[i].publisher);
-              publisher.addClass('list-group-item-action');
-              var type = $('<p>').text(json[i].type);
-              type.addClass('list-group-item-action');
-              var isbn = $('<p>').text(json[i].isbn);
-              isbn.addClass('list-group-item-action');
-              titleDiv.addClass('hidden');
-              titleDiv.attr("hidden");
-              titleDiv.append(author, publisher, type, isbn);
+              var emptyDiv= $('<div>');
+              emptyDiv.addClass('empty-div').hide();
+              emptyDiv.attr("hidden");
+
+              var buttons = $('<div>');
+              buttons.addClass('book-buttons');
+
+              var bookId = $('<p>').text(json[i].id);
+              bookId.addClass("book-id").hide();
+
+              var author = $('<p>').text('Author: ' +json[i].author);
+              author.addClass('list-group-item-action  book-author');
+
+              var publisher = $('<p>').text('Publisher: ' + json[i].publisher);
+              publisher.addClass('list-group-item-action book-publisher');
+
+              var type = $('<p>').text('Genre: ' +json[i].type);
+              type.addClass('list-group-item-action book-type');
+
+              var isbn = $('<p>').text('ISBN number: ' +json[i].isbn);
+              isbn.addClass('list-group-item-action book-isbn');
+
+              var space = $('<br>');
+
+              var showDetailsBtn =$('<button>').text("Show details");
+              showDetailsBtn.addClass('button is-primary show');
+
+              var deleteBook = $('<button>').text('Delete ' + json[i].title);
+              deleteBook.addClass('button is-danger del');
+
+              emptyDiv.append(space, author, publisher, type, isbn, space);
+              buttons.append(showDetailsBtn, space, deleteBook)
+              title.append(space, emptyDiv, space, buttons, space, space);
               newBook.append(title);
-              title.append(titleDiv);
               allBooks.append(newBook);
-
-              console.log(json);
-              console.log(json[i].author);
-              console.log(json[i].title);
             }
-            title.on('click', function(){
-              titleDiv.toggle('hidden');
-              if (titleDiv.attr('hidden')) {
-                  titleDiv.removeAttr('hidden');
-              }else {
-                titleDiv.attr('hidden');
-              }
-            });
+            showBookDetails();
           })
   				.fail(function(xhr,	status,
   				      errorThrown){
@@ -50,6 +62,14 @@ $(document).ready(function(){
   				.always(function(xhr,	status	){
             console.log("Title upload - finished")
               });
+        }
+
+    function showBookDetails() {
+      var showButton = $('.show');
+      showButton.on('click', function(){
+      $(this).parent().siblings('div').toggle(500);
+          });
+      };
 
           // var newBooksLi = $('#allBooks li .hidden')
           // newBooksLi.on('click',function () {
