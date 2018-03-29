@@ -2,6 +2,7 @@ $(document).ready(function(){
   var allBooks = $('#allBooks');
 
   allBooksList();
+  addBook();
 
   function allBooksList() {
     $.ajax({
@@ -71,49 +72,58 @@ $(document).ready(function(){
           });
       };
 
-          // var newBooksLi = $('#allBooks li .hidden')
-          // newBooksLi.on('click',function () {
-          // $.ajax({
-          //   url:	'http://localhost:8282/books',
-          //       data: {id: $(this).id},
-          //       type:"GET",
-          //       dataType: "json",
-          //       })
-          //   .done(function(json1){
-          //       var author = $('<p>').text(json1.author);
-          //       author.addClass('list-group-item-action');
-          //       var publisher = $('<p>').text(json1.publisher);
-          //       publisher.addClass('list-group-item-action');
-          //       var type = $('<p>').text(json1.type);
-          //       type.addClass('list-group-item-action');
-          //       var isbn = $('<p>').text(json1.isbn);
-          //       isbn.addClass('list-group-item-action');
-          //       titleDiv.toggle('hidden');
-          //       titleDiv.append(author, publisher, type, isbn);
-          //       console.log($(this).author);
-          //   })
-          //   .fail(function(xhr,	status,
-          //       errorThrown){
-          //         console.log(status)
-          //       })
-          //     .always(function(xhr,	status	){
-          //         console.log("Book details - finished")
-          //         });
-          //   });
-    // $.ajax({
-    // url: 'http://localhost:8282/books/'
-    // ,
-    // headers: {
-    // 'Accept': 'application/json',
-    // 'Content-Type': 'application/json'
-    // },
-    // type: 'POST'
-    // ,
-    // data: JSON.stringify(book)
-    // ,
-    // dataType: "application/json",
-    //
-    // success: console.log('PUT completed')
-    // });
 
+      // nie działa, przy data: JSON.stringify(book) mam parsererror No conversion from text to application/json
+      // przy data: serializedData mam error Bad Request
+      // działa - dataType nie moze mieć wartości application/json
+      function addBook(){
+        var form = $('#add-book');
+        var book = {
+            	title: "",
+            	author: "",
+            	publisher: "",
+              type: "",
+              isbn: ""};
+
+        form.submit(function(event) {
+          event.preventDefault();
+
+          book.title = $('#newTitle').val();
+          book.author = $('#newAuthor').val();
+          book.publisher = $('#newPublisher').val();
+          book.type = $('#newGenre').val();
+          book.isbn = $('#newIsbn').val();
+
+          console.log($('#newTitle').val());
+
+        $.ajax({
+            headers: {'Accept': 'application/json',
+            'Content-Type': 'application/json'},
+            type: 'POST',
+            data: JSON.stringify(book),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            url: "http://localhost:8282/books/",
+
+        })
+          .done(function (response, textStatus, jqXHR){
+              console.log("Hooray, it worked!");
+              var confirmationMessage = $('<h2>').text('Book has been succesfully added');
+              var confirmationDiv =$('#confirmation');
+              confirmationDiv.css({"color": "green", "font-size": "200%", "align": "center"});
+              confirmationDiv.append(confirmationMessage);
+              allBooksList();
+          })
+          .fail(function (xhr, status, errorThrown){
+              console.error("The following error occurred: "+ status, errorThrown);
+              var confirmationMessage = $('<h2>').text('Error. Book has not been added');
+              var confirmationDiv =$('#confirmation');
+              confirmationDiv.css({"color": "red", "font-size": "200%", "text-align": "center"});
+              confirmationDiv.append(confirmationMessage);
+          })
+          .always(function () {
+              console.log("Add book function ended");
+          });
+        });
+      };
 });
