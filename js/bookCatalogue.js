@@ -4,6 +4,7 @@ $(document).ready(function(){
   allBooksList();
   addBook();
 
+
   function allBooksList() {
     $.ajax({
   				url:	'http://localhost:8282/books',
@@ -46,7 +47,7 @@ $(document).ready(function(){
               showDetailsBtn.addClass('button is-primary show');
 
               var deleteBook = $('<button>').text('Delete ' + json[i].title);
-              deleteBook.addClass('button is-danger del');
+              deleteBook.addClass('button is-danger delete-button');
 
               emptyDiv.append(space, author, publisher, type, isbn, space);
               buttons.append(showDetailsBtn, space, deleteBook)
@@ -55,6 +56,7 @@ $(document).ready(function(){
               allBooks.append(newBook);
             }
             showBookDetails();
+            removeBook();
           })
   				.fail(function(xhr,	status,
   				      errorThrown){
@@ -72,11 +74,8 @@ $(document).ready(function(){
           });
       };
 
-
-      // nie działa, przy data: JSON.stringify(book) mam parsererror No conversion from text to application/json
-      // przy data: serializedData mam error Bad Request
       // działa - dataType nie moze mieć wartości application/json
-      function addBook(){
+    function addBook(){
         var form = $('#add-book');
         var book = {
             	title: "",
@@ -107,23 +106,70 @@ $(document).ready(function(){
 
         })
           .done(function (response, textStatus, jqXHR){
-              console.log("Hooray, it worked!");
+              console.log("Book successfully added.");
+              $('#confirmation').children().remove();
+              $('.list-group-item').remove();
               var confirmationMessage = $('<h2>').text('Book has been succesfully added');
               var confirmationDiv =$('#confirmation');
               confirmationDiv.css({"color": "green", "font-size": "200%", "align": "center"});
               confirmationDiv.append(confirmationMessage);
+              $('#newTitle').val("");
+              $('#newAuthor').val("");
+              $('#newPublisher').val("");
+              $('#newGenre').val("");
+              $('#newIsbn').val("");
               allBooksList();
           })
           .fail(function (xhr, status, errorThrown){
               console.error("The following error occurred: "+ status, errorThrown);
+              $('#confirmation').children().remove();
               var confirmationMessage = $('<h2>').text('Error. Book has not been added');
               var confirmationDiv =$('#confirmation');
               confirmationDiv.css({"color": "red", "font-size": "200%", "text-align": "center"});
               confirmationDiv.append(confirmationMessage);
           })
           .always(function () {
-              console.log("Add book function ended");
+            $('#deleteConfirmation').children().remove();
+            console.log("Add book function ended");
           });
         });
-      };
+    };
+
+    console.log($('.delete-button'));
+    console.log($('.show'));
+
+   function removeBook() {
+     var deleteButton = $('.delete-button');
+     deleteButton.on('click', function(event) {
+       var bookToDelete = $(this).parent().parent().text();
+       var id = bookToDelete.substring(0,bookToDelete.indexOf('.'));
+       $.ajax({
+         url: "http://localhost:8282/books/"+ id,
+         type: 'DELETE',
+       })
+       .done(function (response, textStatus, jqXHR){
+         console.log("Book successfully deleted");
+         $('#deleteConfirmation').children().remove();
+         $('.list-group-item').remove();
+         var confirmationMessage = $('<h2>').text('Book has been succesfully deleted');
+         var confirmationDiv =$('#deleteConfirmation');
+         confirmationDiv.css({"color": "green", "font-size": "200%", "align": "center"});
+         confirmationDiv.append(confirmationMessage);
+         allBooksList();
+       })
+       .fail(function (xhr, status, errorThrown){
+           console.error("The following error occurred: "+ status, errorThrown);
+           $('#deleteConfirmation').children().remove();
+           var confirmationMessage = $('<h2>').text('Error. Book has not been deleted');
+           var confirmationDiv =$('#deleteConfirmation');
+           confirmationDiv.css({"color": "red", "font-size": "200%", "text-align": "center"});
+           confirmationDiv.append(confirmationMessage);
+       })
+       .always(function () {
+         $('#confirmation').children().remove();
+         console.log("Remove book function ended");
+       });
+     });
+   };
+
 });
