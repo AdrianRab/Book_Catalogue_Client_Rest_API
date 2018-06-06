@@ -14,7 +14,7 @@ $(document).ready(function(){
         })
   				.done(function(json){
             var	newBook	=	$('<li>');
-            newBook.addClass('list-group-item'); //stylowanie boostrapem
+            newBook.addClass('list-group-item');
             for (var i = 0; i < json.length; i++) {
               var title = $('<div>').text(json[i].id + '. '+ json[i].title);
               title.addClass('list-group-item-action book-title');
@@ -60,10 +60,10 @@ $(document).ready(function(){
           })
   				.fail(function(xhr,	status,
   				      errorThrown){
-                   console.log(status)
+                   console.log("The following error occurred: "+ status, errorThrown);
                 	})
   				.always(function(xhr,	status	){
-            console.log("Title upload - finished")
+            console.log("Title upload - finished");
               });
         }
 
@@ -74,7 +74,7 @@ $(document).ready(function(){
           });
       };
 
-      // działa - dataType nie moze mieć wartości application/json
+      
     function addBook(){
         var form = $('#add-book');
         var book = {
